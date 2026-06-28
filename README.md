@@ -2,7 +2,8 @@
   <img src="docs/screenshots/app-icon.png" width="120" alt="InfraLab Mobile icon">
 </p>
 
-<h1 align="center">InfraLab Mobile (Android)</h1>
+<h1 align="center">InfraLab Mobile</h1>
+<p align="center"><sub>Android</sub></p>
 
 <p align="center">
   A native Android dashboard for your home-lab / self-hosted stack — Uptime Kuma, Grafana and a Homepage portal in one app.
@@ -85,7 +86,7 @@ Tokens are stored with **EncryptedSharedPreferences**; plain settings in `Shared
 
 ## По-русски
 
-**InfraLab Mobile (Android)** — нативный Android-дашборд для домашней лаборатории / self-hosted стека: **Uptime Kuma**, **Grafana** и портал **Homepage** в одном приложении.
+**InfraLab Mobile** (Android) — нативный Android-дашборд для домашней лаборатории / self-hosted стека: **Uptime Kuma**, **Grafana** и портал **Homepage** в одном приложении.
 
 - **Monitors** — статус-страница **Uptime Kuma** нативно: узлы — сворачиваемые группы со сводной heartbeat-шкалой; тап разворачивает все проверки (ping / port / DNS / push…), у каждой своя Kuma-style шкала, задержка и аптайм за 24 ч.
 - **Metrics** — список дашбордов **Grafana**; открываешь — и все панели рисуются **нативно** по их PromQL (графики на Compose Canvas + stat / gauge / bar-gauge / table) через datasource-proxy.

@@ -76,6 +76,18 @@ data class GFieldDefaults(val unit: String? = null)
 
 enum class PanelKind { TIMESERIES, STAT, GAUGE, BARGAUGE, TABLE, ROW, UNSUPPORTED }
 
+// Optional local pre-fill (assets/seed.json) for personal builds — gitignored, not in repo.
+@Serializable
+data class SeedConfig(
+    val kumaBaseURL: String? = null,
+    val kumaSlug: String? = null,
+    val kumaAPIKey: String? = null,
+    val grafanaBaseURL: String? = null,
+    val grafanaDatasourceUID: String? = null,
+    val grafanaToken: String? = null,
+    val homePageBaseURL: String? = null
+)
+
 data class PanelDef(
     val title: String,
     val kind: PanelKind,

@@ -13,6 +13,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import java.net.URLEncoder
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -51,6 +52,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var dashboardsError by mutableStateOf<String?>(null); private set
 
     private var refreshJob: Job? = null
+
+    init { seedFromAssetsIfNeeded() }
+
+    // Pre-fill Settings from a bundled assets/seed.json on first launch (personal builds).
+    // The file is gitignored — never committed; absent in public clones (then no-op).
+    private fun seedFromAssetsIfNeeded() {
+        if (kumaBaseURL.isNotEmpty() || grafanaBaseURL.isNotEmpty() || homePageBaseURL.isNotEmpty()) return
+        runCatching {
+            val txt = getApplication<Application>().assets.open("seed.json").bufferedReader().use { it.readText() }
+            val s = api.json.decodeFromString<SeedConfig>(txt)
+            s.kumaBaseURL?.let { updateKumaBaseURL(it) }
+            s.kumaSlug?.let { updateKumaSlug(it) }
+            s.grafanaBaseURL?.let { updateGrafanaBaseURL(it) }
+            s.grafanaDatasourceUID?.takeIf { it.isNotEmpty() }?.let { updateGrafanaDatasourceUID(it) }
+            s.homePageBaseURL?.let { updateHomePageBaseURL(it) }
+            s.kumaAPIKey?.takeIf { it.isNotEmpty() }?.let { setKumaAPIKey(it) }
+            s.grafanaToken?.takeIf { it.isNotEmpty() }?.let { setGrafanaToken(it) }
+        }
+    }
 
     // MARK: Orchestration
 
