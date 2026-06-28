@@ -69,7 +69,9 @@ Tokens are stored with **EncryptedSharedPreferences**; plain settings in `Shared
 
 ## Screenshots
 
-_Coming soon._
+| Monitors | Monitors (expanded) | Metrics | HomePage |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/monitors.png" width="200"> | <img src="docs/screenshots/monitors-expanded.png" width="200"> | <img src="docs/screenshots/metrics.png" width="200"> | <img src="docs/screenshots/homepage.png" width="200"> |
 
 ## License
 
