@@ -2,10 +2,14 @@
   <img src="docs/screenshots/app-icon.png" width="120" alt="InfraLab Mobile icon">
 </p>
 
-<h1 align="center">InfraLab Mobile — Android</h1>
+<h1 align="center">InfraLab Mobile (Android)</h1>
 
 <p align="center">
   A native Android dashboard for your home-lab / self-hosted stack — Uptime Kuma, Grafana and a Homepage portal in one app.
+</p>
+
+<p align="center">
+  🍎 iOS version: <a href="https://github.com/eva3si0n/InfraLab-Mobile-iOS">InfraLab-Mobile-iOS</a>
 </p>
 
 <p align="center"><a href="#по-русски">Русская версия ниже ↓</a></p>
@@ -32,7 +36,7 @@ Material 3 with **Dynamic Color (Material You)**, dark-first, read-only, with pu
 
 No backend of its own — it just calls the services you already run, over your LAN/VPN or a reverse proxy.
 
-> iOS version: **[InfraLabMobile](https://github.com/eva3si0n/InfraLabMobile)**.
+> iOS version: **[InfraLab-Mobile-iOS](https://github.com/eva3si0n/InfraLab-Mobile-iOS)**.
 
 ## Requirements
 
@@ -89,7 +93,7 @@ Tokens are stored with **EncryptedSharedPreferences**; plain settings in `Shared
 
 Material 3 с **Dynamic Color (Material You)**, тёмная тема, только чтение, pull-to-refresh. Своего бэкенда нет — приложение обращается к сервисам, которые у тебя уже подняты (по LAN/VPN или через reverse-proxy).
 
-iOS-версия: **[InfraLabMobile](https://github.com/eva3si0n/InfraLabMobile)**.
+iOS-версия: **[InfraLab-Mobile-iOS](https://github.com/eva3si0n/InfraLab-Mobile-iOS)**.
 
 **Требования:** Android 10+ (API 29), JDK 17, Android SDK 35, Gradle 8.9 (wrapper в комплекте).
 
