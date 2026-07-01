@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -119,6 +121,21 @@ fun SettingsScreen(viewModel: AppViewModel) {
             ) {
                 Text("Save & Refresh")
             }
+
+            val ctx = LocalContext.current
+            val version = remember {
+                runCatching {
+                    val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+                    "InfraLab Mobile v${pi.versionName} (build ${pi.longVersionCode})"
+                }.getOrDefault("InfraLab Mobile")
+            }
+            Text(
+                version,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
 
             Spacer(Modifier.height(16.dp))
         }

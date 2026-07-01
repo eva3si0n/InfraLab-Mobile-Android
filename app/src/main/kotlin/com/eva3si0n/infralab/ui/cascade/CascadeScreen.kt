@@ -81,8 +81,11 @@ fun CascadeScreen(vm: AppViewModel) {
                 val ds = durQ.firstOrNull { it.labels["host"] == cfg.host }?.value ?: 0.0
                 val rm = rtt.filter { it.labels["host"] == cfg.host }
                     .mapNotNull { r -> r.labels["leg"]?.let { it to r.value } }.toMap()
-                val grp = vm.monitors.filter { it.groupName == cfg.group }
-                val healthy = grp.isNotEmpty() && grp.all { it.isUp }
+                // Healthy = node reachability (Ping + SSH). Feature/cascade checks (FI handshake,
+                // Geo Routing, services) are shown separately and don't gate node health — FI is
+                // cold-standby, so its dead-man monitors are expected down while on STO/AMS.
+                val reach = vm.monitors.filter { it.groupName == cfg.group && (it.name == "Ping" || it.name == "SSH") }
+                val healthy = reach.isNotEmpty() && reach.all { it.isUp }
                 val casc = vm.monitors.firstOrNull { it.groupName == "VPN Cascade" && it.name.contains(cfg.match) }
                 Seg(cfg.host, cfg.title, al, ds, rm,
                     txbps.firstOrNull { it.labels["host"] == cfg.host }?.value,
