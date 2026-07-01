@@ -3,6 +3,7 @@ package com.eva3si0n.infralab.ui
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Sensors
@@ -17,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.eva3si0n.infralab.ui.cascade.CascadeScreen
 import com.eva3si0n.infralab.ui.homepage.HomePageScreen
 import com.eva3si0n.infralab.ui.metrics.MetricsScreen
 import com.eva3si0n.infralab.ui.monitors.MonitorsScreen
@@ -26,6 +28,7 @@ private data class Tab(val route: String, val label: String, val icon: ImageVect
 
 private val tabs = listOf(
     Tab("monitors", "Monitors", Icons.Default.Sensors),
+    Tab("cascade", "Cascade", Icons.AutoMirrored.Filled.AltRoute),
     Tab("metrics", "Metrics", Icons.Default.BarChart),
     Tab("homepage", "HomePage", Icons.Default.Home),
     Tab("settings", "Settings", Icons.Default.Settings),
@@ -59,6 +62,7 @@ fun AppNavigation(vm: AppViewModel) {
     }) { padding ->
         NavHost(nav, startDestination = "monitors", modifier = Modifier.padding(padding)) {
             composable("monitors") { MonitorsScreen(vm) }
+            composable("cascade") { CascadeScreen(vm) }
             composable("metrics") { MetricsScreen(vm) }
             composable("homepage") { HomePageScreen(vm) }
             composable("settings") { SettingsScreen(vm) }
