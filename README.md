@@ -81,6 +81,10 @@ Tokens are stored with **EncryptedSharedPreferences**; plain settings in `Shared
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/monitors.png" width="200"> | <img src="docs/screenshots/monitors-expanded.png" width="200"> | <img src="docs/screenshots/metrics.png" width="200"> | <img src="docs/screenshots/homepage.png" width="200"> |
 
+### VPN Cascade
+
+<p align="center"><img src="docs/screenshots/cascade.png" width="300" alt="VPN Cascade tab"></p>
+
 ## License
 
 [MIT](LICENSE) © Ivan Serditykh
