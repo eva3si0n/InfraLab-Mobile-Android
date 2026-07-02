@@ -77,6 +77,16 @@ data class GFieldDefaults(val unit: String? = null)
 enum class PanelKind { TIMESERIES, STAT, GAUGE, BARGAUGE, TABLE, ROW, UNSUPPORTED }
 
 // Optional local pre-fill (assets/seed.json) for personal builds — gitignored, not in repo.
+// VPN Cascade segment config — real host / Kuma-group names live only in the personal
+// (gitignored) assets/seed.json; public code / seed.example.json carry placeholders.
+@Serializable
+data class CascadeSegmentCfg(
+    val host: String,
+    val title: String,
+    val kumaGroup: String,
+    val cascadeMatch: String
+)
+
 @Serializable
 data class SeedConfig(
     val kumaBaseURL: String? = null,
@@ -85,7 +95,9 @@ data class SeedConfig(
     val grafanaBaseURL: String? = null,
     val grafanaDatasourceUID: String? = null,
     val grafanaToken: String? = null,
-    val homePageBaseURL: String? = null
+    val homePageBaseURL: String? = null,
+    val cascadeSegments: List<CascadeSegmentCfg>? = null,
+    val cascadeTrafficHosts: Map<String, String>? = null
 )
 
 data class PanelDef(

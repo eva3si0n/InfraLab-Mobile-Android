@@ -51,9 +51,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var dashboardsLoading by mutableStateOf(false); private set
     var dashboardsError by mutableStateOf<String?>(null); private set
 
+    // VPN Cascade layout — from bundled assets/seed.json; placeholder defaults for public builds.
+    var cascadeSegments: List<CascadeSegmentCfg> = listOf(
+        CascadeSegmentCfg("node-a", "Wired · FQDN хоста", "Node A", "node-a"),
+        CascadeSegmentCfg("node-b", "Mobile · FQDN хоста", "Node B", "node-b")
+    ); private set
+    var cascadeTrafficHosts: Map<String, String> = emptyMap(); private set
+
     private var refreshJob: Job? = null
 
-    init { seedFromAssetsIfNeeded() }
+    init { seedFromAssetsIfNeeded(); loadCascadeConfig() }
 
     // Pre-fill Settings from a bundled assets/seed.json on first launch (personal builds).
     // The file is gitignored — never committed; absent in public clones (then no-op).
@@ -69,6 +76,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             s.homePageBaseURL?.let { updateHomePageBaseURL(it) }
             s.kumaAPIKey?.takeIf { it.isNotEmpty() }?.let { setKumaAPIKey(it) }
             s.grafanaToken?.takeIf { it.isNotEmpty() }?.let { setGrafanaToken(it) }
+        }
+    }
+
+    // Cascade layout from the bundled seed.json (real node/group names only there, gitignored).
+    private fun loadCascadeConfig() {
+        runCatching {
+            val txt = getApplication<Application>().assets.open("seed.json").bufferedReader().use { it.readText() }
+            val s = api.json.decodeFromString<SeedConfig>(txt)
+            s.cascadeSegments?.takeIf { it.isNotEmpty() }?.let { cascadeSegments = it }
+            s.cascadeTrafficHosts?.let { cascadeTrafficHosts = it }
         }
     }
 

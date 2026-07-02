@@ -35,12 +35,7 @@ private val PENDING = Color(0xFFF8A532)
 private val MAINT = Color(0xFF459BFF)
 private fun legColor(l: String) = when (l) { "sto" -> STO; "ams" -> AMS; "fi" -> FI; else -> Color.Gray }
 
-private data class SegCfg(val host: String, val title: String, val group: String, val match: String)
-private val SEG_CFG = listOf(
-    SegCfg("node-a", "Wired · node-a (UDM Pro — VLAN 30, 40)", "Node A", "node-a"),
-    SegCfg("node-b", "Mobile · node-b (UniFi APs + LTE — VLAN 70, 80)", "Node B", "node-b")
-)
-private const val CASCADE_HINT = "up — активное плечо STO/AMS (чистый Vultr-egress); down — деградация на FI (оба Vultr-плеча недоступны) или несвежий handshake."
+private const val CASCADE_HINT ="up — активное плечо STO/AMS (чистый Vultr-egress); down — деградация на FI (оба Vultr-плеча недоступны) или несвежий handshake."
 private const val EGRESS_HINT = "Лимит Vultr 2 ТБ на инстанс (STO и AMS отдельно), считается outbound (tx), сброс 1-го числа. FI — cold standby, квота не отслеживается."
 
 private data class Seg(
@@ -49,7 +44,7 @@ private data class Seg(
     val healthy: Boolean, val cascade: MonitorStatus?
 )
 private data class Leg(val leg: String, val homeRtt: Double?, val txBytes: Double?, val limitBytes: Double?)
-private data class Migration(val host: String, val from: String, val to: String, val epoch: Long)
+private data class Migration(val host: String, val label: String, val from: String, val to: String, val epoch: Long)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +71,7 @@ fun CascadeScreen(vm: AppViewModel) {
             val lim = vm.promInstant("vds_month_limit_bytes", "")
             val sw = vm.promInstant("vpn_egress_switch_time", "")
 
-            segs = SEG_CFG.map { cfg ->
+            segs = vm.cascadeSegments.map { cfg ->
                 val al = active.firstOrNull { it.labels["host"] == cfg.host }?.labels?.get("leg") ?: "—"
                 val ds = durQ.firstOrNull { it.labels["host"] == cfg.host }?.value ?: 0.0
                 val rm = rtt.filter { it.labels["host"] == cfg.host }
@@ -84,23 +79,26 @@ fun CascadeScreen(vm: AppViewModel) {
                 // Healthy = node reachability (Ping + SSH). Feature/cascade checks (FI handshake,
                 // Geo Routing, services) are shown separately and don't gate node health — FI is
                 // cold-standby, so its dead-man monitors are expected down while on STO/AMS.
-                val reach = vm.monitors.filter { it.groupName == cfg.group && (it.name == "Ping" || it.name == "SSH") }
+                val reach = vm.monitors.filter { it.groupName == cfg.kumaGroup && (it.name == "Ping" || it.name == "SSH") }
                 val healthy = reach.isNotEmpty() && reach.all { it.isUp }
-                val casc = vm.monitors.firstOrNull { it.groupName == "VPN Cascade" && it.name.contains(cfg.match) }
+                val casc = vm.monitors.firstOrNull { it.groupName == "VPN Cascade" && it.name.contains(cfg.cascadeMatch) }
                 Seg(cfg.host, cfg.title, al, ds, rm,
                     txbps.firstOrNull { it.labels["host"] == cfg.host }?.value,
                     rxbps.firstOrNull { it.labels["host"] == cfg.host }?.value,
                     healthy, casc)
             }
             legs = listOf("sto", "ams", "fi").map { l ->
-                val host = when (l) { "sto" -> "egress-a"; "ams" -> "egress-b"; else -> "" }
+                val host = vm.cascadeTrafficHosts[l] ?: ""
                 Leg(l, home.firstOrNull { it.labels["node"] == l }?.value,
                     if (host.isEmpty()) null else tx.firstOrNull { it.labels["host"] == host }?.value,
                     if (host.isEmpty()) null else lim.firstOrNull { it.labels["host"] == host }?.value)
             }
             history = sw.mapNotNull { r ->
                 val f = r.labels["from"]; val t = r.labels["to"]; val h = r.labels["host"]
-                if (f == null || t == null || h == null) null else Migration(h, f, t, r.value.toLong())
+                if (f == null || t == null || h == null) null else {
+                    val label = vm.cascadeSegments.firstOrNull { it.host == h }?.title?.substringBefore(" · ") ?: h
+                    Migration(h, label, f, t, r.value.toLong())
+                }
             }.sortedByDescending { it.epoch }
             error = null
         } catch (e: Exception) {
@@ -166,7 +164,7 @@ private fun CascadeCard(s: Seg) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Canvas(Modifier.size(8.dp)) { drawCircle(if (s.cascade?.isUp == true) STO else DOWN) }
                 Spacer(Modifier.width(8.dp))
-                Text("Cascade — ${if (s.host == "node-a") "Wired" else "Mobile"} (${s.host})",
+                Text("Cascade — ${s.title.substringBefore(" · ")}",
                     style = MaterialTheme.typography.bodyMedium)
             }
             s.cascade?.recentBeats?.takeIf { it.isNotEmpty() }?.let {
@@ -223,7 +221,7 @@ private fun HistoryCard(history: List<Migration>) {
             } else {
                 history.forEach { m ->
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(if (m.host == "node-a") "Wired" else "Mobile",
+                        Text(m.label,
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(48.dp))
                         Pill(m.from.uppercase(), legColor(m.from))
